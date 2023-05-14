@@ -162,7 +162,7 @@ public class LocationModule extends ExportedModule implements LifecycleEventList
     if (Build.VERSION.SDK_INT == Build.VERSION_CODES.Q) {
       mPermissionsManager.askForPermissions(result -> {
         promise.resolve(handleLegacyPermissions(result));
-      }, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_BACKGROUND_LOCATION);
+      }, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_BACKGROUND_LOCATION);
     } else {
       requestForegroundPermissionsAsync(promise);
     }
@@ -179,7 +179,7 @@ public class LocationModule extends ExportedModule implements LifecycleEventList
     if (Build.VERSION.SDK_INT == Build.VERSION_CODES.Q) {
       mPermissionsManager.getPermissions(result -> {
         promise.resolve(handleLegacyPermissions(result));
-      }, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_BACKGROUND_LOCATION);
+      }, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_BACKGROUND_LOCATION);
     } else {
       getForegroundPermissionsAsync(promise);
     }
@@ -193,7 +193,7 @@ public class LocationModule extends ExportedModule implements LifecycleEventList
     }
     mPermissionsManager.askForPermissions(result -> {
       promise.resolve(handleForegroundLocationPermissions(result));
-    }, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION);
+    }, Manifest.permission.ACCESS_COARSE_LOCATION);
   }
 
   @ExpoMethod
@@ -225,7 +225,7 @@ public class LocationModule extends ExportedModule implements LifecycleEventList
     }
     mPermissionsManager.getPermissions(result -> {
       promise.resolve(handleForegroundLocationPermissions(result));
-    }, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION);
+    }, Manifest.permission.ACCESS_COARSE_LOCATION);
   }
 
   @ExpoMethod
@@ -589,9 +589,8 @@ public class LocationModule extends ExportedModule implements LifecycleEventList
     if (mPermissionsManager == null) {
       return true;
     }
-    boolean canAccessFineLocation = mPermissionsManager.hasGrantedPermissions(Manifest.permission.ACCESS_FINE_LOCATION);
     boolean canAccessCoarseLocation = mPermissionsManager.hasGrantedPermissions(Manifest.permission.ACCESS_COARSE_LOCATION);
-    return !canAccessFineLocation && !canAccessCoarseLocation;
+    return !canAccessCoarseLocation;
   }
 
   /**
@@ -839,29 +838,22 @@ public class LocationModule extends ExportedModule implements LifecycleEventList
   }
 
   private Bundle handleForegroundLocationPermissions(Map<String, PermissionsResponse> result) {
-    PermissionsResponse accessFineLocation = result.get(Manifest.permission.ACCESS_FINE_LOCATION);
     PermissionsResponse accessCoarseLocation = result.get(Manifest.permission.ACCESS_COARSE_LOCATION);
     /**
      * Missing permissions from OS callback should be considered as denied permissions
      */
-    if(accessFineLocation == null) {
-      accessFineLocation = new PermissionsResponse(PermissionsStatus.DENIED, true);
-    }
     if(accessCoarseLocation == null) {
       accessCoarseLocation = new PermissionsResponse(PermissionsStatus.DENIED, true);
     }
 
     PermissionsStatus status = PermissionsStatus.UNDETERMINED;
     String accuracy = "none";
-    boolean canAskAgain = accessCoarseLocation.getCanAskAgain() && accessFineLocation.getCanAskAgain();
+    boolean canAskAgain = accessCoarseLocation.getCanAskAgain();
 
-    if (accessFineLocation.getStatus() == PermissionsStatus.GRANTED) {
-      accuracy = "fine";
-      status = PermissionsStatus.GRANTED;
-    } else if (accessCoarseLocation.getStatus() == PermissionsStatus.GRANTED) {
+    if (accessCoarseLocation.getStatus() == PermissionsStatus.GRANTED) {
       accuracy = "coarse";
       status = PermissionsStatus.GRANTED;
-    } else if (accessFineLocation.getStatus() == PermissionsStatus.DENIED && accessCoarseLocation.getStatus() == PermissionsStatus.DENIED) {
+    } else if (accessCoarseLocation.getStatus() == PermissionsStatus.DENIED) {
       status = PermissionsStatus.DENIED;
     }
 
@@ -900,25 +892,20 @@ public class LocationModule extends ExportedModule implements LifecycleEventList
 
   @RequiresApi(Build.VERSION_CODES.Q)
   private Bundle handleLegacyPermissions(Map<String, PermissionsResponse> result) {
-    PermissionsResponse accessFineLocation = result.get(Manifest.permission.ACCESS_FINE_LOCATION);
     PermissionsResponse accessCoarseLocation = result.get(Manifest.permission.ACCESS_COARSE_LOCATION);
     PermissionsResponse backgroundLocation = result.get(Manifest.permission.ACCESS_BACKGROUND_LOCATION);
 
-    Objects.requireNonNull(accessFineLocation);
     Objects.requireNonNull(accessCoarseLocation);
     Objects.requireNonNull(backgroundLocation);
 
     PermissionsStatus status = PermissionsStatus.UNDETERMINED;
     String accuracy = "none";
-    boolean canAskAgain = accessCoarseLocation.getCanAskAgain() && accessFineLocation.getCanAskAgain();
+    boolean canAskAgain = accessCoarseLocation.getCanAskAgain();
 
-    if (accessFineLocation.getStatus() == PermissionsStatus.GRANTED) {
-      accuracy = "fine";
-      status = PermissionsStatus.GRANTED;
-    } else if (accessCoarseLocation.getStatus() == PermissionsStatus.GRANTED) {
+    if (accessCoarseLocation.getStatus() == PermissionsStatus.GRANTED) {
       accuracy = "coarse";
       status = PermissionsStatus.GRANTED;
-    } else if (accessFineLocation.getStatus() == PermissionsStatus.DENIED && accessCoarseLocation.getStatus() == PermissionsStatus.DENIED) {
+    } else if (accessCoarseLocation.getStatus() == PermissionsStatus.DENIED) {
       status = PermissionsStatus.DENIED;
     }
 

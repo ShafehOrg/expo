@@ -50,7 +50,6 @@ This module requires the permissions for approximate and exact device location. 
 ```xml
 <!-- Added permissions -->
 <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
 <!-- Optional permissions -->

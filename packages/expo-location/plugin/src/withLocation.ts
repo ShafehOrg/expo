@@ -63,7 +63,6 @@ const withLocation: ConfigPlugin<
     config,
     [
       'android.permission.ACCESS_COARSE_LOCATION',
-      'android.permission.ACCESS_FINE_LOCATION',
       'android.permission.FOREGROUND_SERVICE',
       // Optional
       isAndroidBackgroundLocationEnabled && 'android.permission.ACCESS_BACKGROUND_LOCATION',

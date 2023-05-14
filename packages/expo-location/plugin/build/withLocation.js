@@ -35,7 +35,6 @@ const withLocation = (config, { locationAlwaysAndWhenInUsePermission, locationAl
     });
     return config_plugins_1.AndroidConfig.Permissions.withPermissions(config, [
         'android.permission.ACCESS_COARSE_LOCATION',
-        'android.permission.ACCESS_FINE_LOCATION',
         'android.permission.FOREGROUND_SERVICE',
         // Optional
         isAndroidBackgroundLocationEnabled && 'android.permission.ACCESS_BACKGROUND_LOCATION',
